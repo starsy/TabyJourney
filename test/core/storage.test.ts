@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { StorageManager } from '@core/storage';
 import { createMockStorageAPI } from '../mocks/chrome-api-mock';
-import type { HistoryState, HistoryEntry } from '@types/history';
+import type { HistoryState, HistoryEntry } from '@/types/history';
 
 describe('StorageManager', () => {
   let storageManager: StorageManager;

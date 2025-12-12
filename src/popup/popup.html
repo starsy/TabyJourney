@@ -7,9 +7,21 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <div id="app">
-    <h1>TabyJourney</h1>
-    <p>Tab history will be displayed here.</p>
+  <div class="container">
+    <!-- ヘッダー -->
+    <div class="header">
+      <h1 class="title">🧭 TabyJourney</h1>
+      <div class="controls">
+        <button id="backward-btn" class="nav-btn" title="Backward (Alt+←)">←</button>
+        <button id="forward-btn" class="nav-btn" title="Forward (Alt+→)">→</button>
+        <span class="count">履歴: <span id="history-count">0 / 100</span></span>
+      </div>
+    </div>
+
+    <!-- 履歴リスト -->
+    <div id="history-list" class="history-list">
+      <!-- 動的に生成 -->
+    </div>
   </div>
   <script type="module" src="popup.ts"></script>
 </body>

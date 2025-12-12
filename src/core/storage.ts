@@ -1,5 +1,5 @@
-import type { StorageAPI } from '@types/chrome-api';
-import type { HistoryState } from '@types/history';
+import type { StorageAPI } from '@/types/chrome-api';
+import type { HistoryState } from '@/types/history';
 
 const STORAGE_KEY = 'tabyjourney_history_state';
 const DEFAULT_MAX_SIZE = 100;

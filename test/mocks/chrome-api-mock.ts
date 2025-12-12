@@ -1,5 +1,4 @@
-import { vi } from 'vitest';
-import type { StorageAPI } from '@types/chrome-api';
+import type { StorageAPI } from '@/types/chrome-api';
 
 /**
  * Chrome Storage API のモック実装

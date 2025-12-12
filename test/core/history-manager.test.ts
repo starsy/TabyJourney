@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { HistoryManager } from '@core/history-manager';
-import type { HistoryEntry } from '@types/history';
+import type { HistoryEntry } from '@/types/history';
 
 describe('HistoryManager', () => {
   let historyManager: HistoryManager;

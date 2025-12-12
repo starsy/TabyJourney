@@ -1,5 +1,5 @@
 import type { HistoryManager } from './history-manager';
-import type { NavigationResult } from '@types/history';
+import type { NavigationResult } from '@/types/history';
 
 /**
  * タブ履歴のナビゲーションを制御

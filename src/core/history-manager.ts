@@ -1,4 +1,4 @@
-import type { HistoryEntry, HistoryState } from '@types/history';
+import type { HistoryEntry, HistoryState } from '@/types/history';
 
 const DEFAULT_MAX_SIZE = 100;
 

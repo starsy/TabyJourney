@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { NavigationController } from '@core/navigation';
 import { HistoryManager } from '@core/history-manager';
-import type { HistoryEntry } from '@types/history';
+import type { HistoryEntry } from '@/types/history';
 
 describe('NavigationController', () => {
   let navigationController: NavigationController;
