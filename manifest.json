@@ -59,12 +59,6 @@
         "default": "Alt+K"
       },
       "description": "Go to next tab in history (Alt+K)"
-    },
-    "show-history": {
-      "suggested_key": {
-        "default": "Alt+H"
-      },
-      "description": "Show tab history list"
     }
   }
 }

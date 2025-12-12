@@ -179,10 +179,6 @@ function handleCommand(command: string): void {
     case 'forward-k':
       executeForward();
       break;
-    case 'show-history':
-      // ポップアップを開く（chrome.action.openPopup は Service Worker では使えない）
-      console.log('[TabyJourney] Show history command (use popup icon)');
-      break;
     default:
       console.warn('[TabyJourney] Unknown command:', command);
   }
