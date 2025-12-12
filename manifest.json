@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "TabyJourney",
+  "version": "0.1.0",
+  "description": "Navigate tab history like browser history with Backward/Forward buttons",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "tabs",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "src/background/service-worker.ts",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_page": "src/options/options.html",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/content.ts"],
+      "run_at": "document_start"
+    }
+  ],
+  "commands": {
+    "backward": {
+      "suggested_key": {
+        "default": "Alt+Left"
+      },
+      "description": "Go to previous tab in history"
+    },
+    "forward": {
+      "suggested_key": {
+        "default": "Alt+Right"
+      },
+      "description": "Go to next tab in history"
+    },
+    "show-history": {
+      "suggested_key": {
+        "default": "Alt+H"
+      },
+      "description": "Show tab history list"
+    }
+  }
+}
