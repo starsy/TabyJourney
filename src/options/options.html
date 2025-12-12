@@ -3,13 +3,91 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TabyJourney Settings</title>
+  <title>TabyJourney 設定</title>
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
-  <div id="app">
-    <h1>TabyJourney Settings</h1>
-    <p>Settings will be displayed here.</p>
+  <div class="container">
+    <header class="header">
+      <h1>🧭 TabyJourney 設定</h1>
+      <p class="subtitle">タブ履歴ナビゲーションの設定をカスタマイズ</p>
+    </header>
+
+    <main class="main">
+      <div class="section">
+        <h2 class="section-title">履歴設定</h2>
+
+        <div class="setting-item">
+          <label for="maxHistorySize" class="label">
+            <span class="label-text">履歴の保存上限</span>
+            <span class="label-description">保持するタブ履歴の最大数</span>
+          </label>
+          <div class="input-group">
+            <input type="number" id="maxHistorySize" min="10" max="1000" step="10" class="input-number">
+            <span class="unit">件</span>
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <label class="checkbox-label">
+            <input type="checkbox" id="removeClosedTabs" class="checkbox">
+            <div class="checkbox-content">
+              <span class="label-text">閉じたタブを履歴から自動削除</span>
+              <span class="label-description">タブを閉じたときに履歴からも削除します</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">操作設定</h2>
+
+        <div class="setting-item">
+          <label class="checkbox-label">
+            <input type="checkbox" id="enableMouseGesture" class="checkbox">
+            <div class="checkbox-content">
+              <span class="label-text">マウスジェスチャーを有効化</span>
+              <span class="label-description">Shift + マウス戻る/進むボタンで履歴ナビゲーション</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="setting-item">
+          <label class="checkbox-label">
+            <input type="checkbox" id="showNotification" class="checkbox">
+            <div class="checkbox-content">
+              <span class="label-text">通知を表示</span>
+              <span class="label-description">履歴の端に達したときに通知を表示</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">高度な設定</h2>
+
+        <div class="setting-item">
+          <label class="checkbox-label">
+            <input type="checkbox" id="separateByWindow" class="checkbox">
+            <div class="checkbox-content">
+              <span class="label-text">ウィンドウ別に履歴を管理</span>
+              <span class="label-description">各ウィンドウで独立した履歴を保持（実験的機能）</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="saveBtn" class="btn btn-primary">保存</button>
+        <button id="resetBtn" class="btn btn-secondary">デフォルトに戻す</button>
+        <div id="saveStatus" class="save-status"></div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>キーボードショートカット: Alt+← (戻る) / Alt+→ (進む) / Alt+H (履歴)</p>
+      <p class="version">TabyJourney v0.1.0</p>
+    </footer>
   </div>
   <script type="module" src="options.ts"></script>
 </body>
