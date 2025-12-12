@@ -38,17 +38,15 @@
   "commands": {
     "backward": {
       "suggested_key": {
-        "default": "Ctrl+Shift+Left",
-        "mac": "Command+Shift+Left"
+        "default": "Alt+Left"
       },
-      "description": "Go to previous tab in history"
+      "description": "Go to previous tab in history (Alt+←)"
     },
     "forward": {
       "suggested_key": {
-        "default": "Ctrl+Shift+Right",
-        "mac": "Command+Shift+Right"
+        "default": "Alt+Right"
       },
-      "description": "Go to next tab in history"
+      "description": "Go to next tab in history (Alt+→)"
     },
     "backward-j": {
       "suggested_key": {

@@ -23,7 +23,8 @@ async function activateTab(tabId: number): Promise<void> {
  */
 async function executeBackward(): Promise<void> {
   chrome.runtime.sendMessage({ type: 'backward' });
-  window.close(); // ポップアップを閉じる
+  // ポップアップは閉じずに、履歴を再読み込みして更新
+  await refreshHistory();
 }
 
 /**
@@ -31,7 +32,20 @@ async function executeBackward(): Promise<void> {
  */
 async function executeForward(): Promise<void> {
   chrome.runtime.sendMessage({ type: 'forward' });
-  window.close(); // ポップアップを閉じる
+  // ポップアップは閉じずに、履歴を再読み込みして更新
+  await refreshHistory();
+}
+
+/**
+ * 履歴を再読み込みして表示を更新
+ */
+async function refreshHistory(): Promise<void> {
+  // 少し待ってから更新（Service Workerの処理完了を待つ）
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
+  const state = await getHistory();
+  updateHeader(state);
+  renderHistoryList(state);
 }
 
 /**
@@ -108,7 +122,8 @@ function renderHistoryList(state: HistoryState): void {
     // クリックイベント
     item.addEventListener('click', async () => {
       await activateTab(entry.tabId);
-      window.close();
+      // ポップアップは閉じずに、履歴を再読み込みして更新
+      await refreshHistory();
     });
 
     listContainer.appendChild(item);
