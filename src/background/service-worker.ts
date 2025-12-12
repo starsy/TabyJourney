@@ -172,9 +172,11 @@ function handleCommand(command: string): void {
 
   switch (command) {
     case 'backward':
+    case 'backward-j':
       executeBackward();
       break;
     case 'forward':
+    case 'forward-k':
       executeForward();
       break;
     case 'show-history':
