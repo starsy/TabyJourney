@@ -3,6 +3,8 @@
   "name": "TabyJourney",
   "version": "0.1.0",
   "description": "Navigate tab history like browser history with Backward/Forward buttons",
+  "author": "Your Name",
+  "homepage_url": "https://github.com/yourusername/TabyJourney",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -36,29 +38,12 @@
     }
   ],
   "commands": {
-    "backward": {
+    "_execute_action": {
       "suggested_key": {
-        "default": "Alt+Left"
+        "default": "Alt+L",
+        "mac": "Alt+L"
       },
-      "description": "Go to previous tab in history (Alt+←)"
-    },
-    "forward": {
-      "suggested_key": {
-        "default": "Alt+Right"
-      },
-      "description": "Go to next tab in history (Alt+→)"
-    },
-    "backward-j": {
-      "suggested_key": {
-        "default": "Alt+J"
-      },
-      "description": "Go to previous tab in history (Alt+J)"
-    },
-    "forward-k": {
-      "suggested_key": {
-        "default": "Alt+K"
-      },
-      "description": "Go to next tab in history (Alt+K)"
+      "description": "Show tab history popup"
     }
   }
 }

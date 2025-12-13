@@ -1,7 +1,7 @@
 import type { HistoryState, HistoryEntry } from '@/types/history';
 
 /**
- * Service Workerから履歴を取得
+ * Get history from Service Worker
  */
 async function getHistory(): Promise<HistoryState> {
   return new Promise((resolve) => {
@@ -12,35 +12,35 @@ async function getHistory(): Promise<HistoryState> {
 }
 
 /**
- * タブをアクティブ化
+ * Activate tab
  */
 async function activateTab(tabId: number): Promise<void> {
   await chrome.tabs.update(tabId, { active: true });
 }
 
 /**
- * Backward コマンドを実行
+ * Execute backward command
  */
 async function executeBackward(): Promise<void> {
   chrome.runtime.sendMessage({ type: 'backward' });
-  // ポップアップは閉じずに、履歴を再読み込みして更新
+  // Don't close popup, refresh history to update display
   await refreshHistory();
 }
 
 /**
- * Forward コマンドを実行
+ * Execute forward command
  */
 async function executeForward(): Promise<void> {
   chrome.runtime.sendMessage({ type: 'forward' });
-  // ポップアップは閉じずに、履歴を再読み込みして更新
+  // Don't close popup, refresh history to update display
   await refreshHistory();
 }
 
 /**
- * 履歴を再読み込みして表示を更新
+ * Refresh history and update display
  */
 async function refreshHistory(): Promise<void> {
-  // 少し待ってから更新（Service Workerの処理完了を待つ）
+  // Wait a bit for Service Worker processing to complete
   await new Promise((resolve) => setTimeout(resolve, 100));
 
   const state = await getHistory();
@@ -49,7 +49,7 @@ async function refreshHistory(): Promise<void> {
 }
 
 /**
- * 相対時刻を表示（例: "2分前"）
+ * Display relative time (e.g., "2 minutes ago")
  */
 function getRelativeTime(timestamp: number): string {
   const now = Date.now();
@@ -61,18 +61,18 @@ function getRelativeTime(timestamp: number): string {
   const days = Math.floor(hours / 24);
 
   if (seconds < 60) {
-    return 'たった今';
+    return 'just now';
   } else if (minutes < 60) {
-    return `${minutes}分前`;
+    return `${minutes} min ago`;
   } else if (hours < 24) {
-    return `${hours}時間前`;
+    return `${hours} hours ago`;
   } else {
-    return `${days}日前`;
+    return `${days} days ago`;
   }
 }
 
 /**
- * 履歴リストを描画
+ * Render history list
  */
 function renderHistoryList(state: HistoryState): void {
   const listContainer = document.getElementById('history-list');
@@ -81,7 +81,7 @@ function renderHistoryList(state: HistoryState): void {
   listContainer.innerHTML = '';
 
   if (state.entries.length === 0) {
-    listContainer.innerHTML = '<div class="empty-message">履歴がありません</div>';
+    listContainer.innerHTML = '<div class="empty-message">No history</div>';
     return;
   }
 
@@ -93,7 +93,7 @@ function renderHistoryList(state: HistoryState): void {
       item.classList.add('current');
     }
 
-    // ファビコン
+    // Favicon
     const favicon = document.createElement('img');
     favicon.className = 'favicon';
     favicon.src = entry.favicon || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>';
@@ -101,7 +101,7 @@ function renderHistoryList(state: HistoryState): void {
       favicon.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>';
     };
 
-    // テキスト部分
+    // Text container
     const textContainer = document.createElement('div');
     textContainer.className = 'text-container';
 
@@ -119,10 +119,10 @@ function renderHistoryList(state: HistoryState): void {
     item.appendChild(favicon);
     item.appendChild(textContainer);
 
-    // クリックイベント
+    // Click event
     item.addEventListener('click', async () => {
       await activateTab(entry.tabId);
-      // ポップアップは閉じずに、履歴を再読み込みして更新
+      // Don't close popup, refresh history to update display
       await refreshHistory();
     });
 
@@ -131,7 +131,7 @@ function renderHistoryList(state: HistoryState): void {
 }
 
 /**
- * ヘッダー情報を更新
+ * Update header information
  */
 function updateHeader(state: HistoryState): void {
   const countElement = document.getElementById('history-count');
@@ -139,7 +139,7 @@ function updateHeader(state: HistoryState): void {
     countElement.textContent = `${state.entries.length} / ${state.maxSize}`;
   }
 
-  // Backward/Forwardボタンの有効/無効を設定
+  // Enable/disable Backward/Forward buttons
   const backwardBtn = document.getElementById('backward-btn') as HTMLButtonElement;
   const forwardBtn = document.getElementById('forward-btn') as HTMLButtonElement;
 
@@ -153,7 +153,7 @@ function updateHeader(state: HistoryState): void {
 }
 
 /**
- * 初期化
+ * Initialize
  */
 async function initialize(): Promise<void> {
   const state = await getHistory();
@@ -161,18 +161,18 @@ async function initialize(): Promise<void> {
   updateHeader(state);
   renderHistoryList(state);
 
-  // Backward ボタン
+  // Backward button
   const backwardBtn = document.getElementById('backward-btn');
   if (backwardBtn) {
     backwardBtn.addEventListener('click', executeBackward);
   }
 
-  // Forward ボタン
+  // Forward button
   const forwardBtn = document.getElementById('forward-btn');
   if (forwardBtn) {
     forwardBtn.addEventListener('click', executeForward);
   }
 }
 
-// DOM読み込み完了後に初期化
+// Initialize after DOM loaded
 document.addEventListener('DOMContentLoaded', initialize);

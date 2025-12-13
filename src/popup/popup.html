@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,19 +8,19 @@
 </head>
 <body>
   <div class="container">
-    <!-- ヘッダー -->
+    <!-- Header -->
     <div class="header">
       <h1 class="title">🧭 TabyJourney</h1>
       <div class="controls">
-        <button id="backward-btn" class="nav-btn" title="Backward (Alt+← or Alt+J)">←</button>
-        <button id="forward-btn" class="nav-btn" title="Forward (Alt+→ or Alt+K)">→</button>
-        <span class="count">履歴: <span id="history-count">0 / 100</span></span>
+        <button id="backward-btn" class="nav-btn" title="Backward (Alt+[ or ⌥[)">←</button>
+        <button id="forward-btn" class="nav-btn" title="Forward (Alt+] or ⌥])">→</button>
+        <span class="count">History: <span id="history-count">0 / 100</span></span>
       </div>
     </div>
 
-    <!-- 履歴リスト -->
+    <!-- History list -->
     <div id="history-list" class="history-list">
-      <!-- 動的に生成 -->
+      <!-- Dynamically generated -->
     </div>
   </div>
   <script type="module" src="popup.ts"></script>

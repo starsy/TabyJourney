@@ -57,3 +57,16 @@ chrome-load:
     @echo "2. 「デベロッパーモード」を有効にする"
     @echo "3. 「パッケージ化されていない拡張機能を読み込む」をクリック"
     @echo "4. このプロジェクトの dist/ ディレクトリを選択"
+
+# Chrome Web Store用にパッケージング
+package: build
+    @echo "Creating package for Chrome Web Store..."
+    @rm -f tabyjourney.zip
+    @cd dist && zip -r ../tabyjourney.zip .
+    @echo "✓ Package created: tabyjourney.zip"
+    @echo "Upload this file to Chrome Web Store Developer Dashboard"
+
+# パッケージファイルを削除
+clean-package:
+    @rm -f tabyjourney.zip
+    @echo "✓ Package file removed"

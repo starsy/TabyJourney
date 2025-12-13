@@ -165,26 +165,6 @@ async function executeForward(): Promise<void> {
 }
 
 /**
- * コマンドハンドラー
- */
-function handleCommand(command: string): void {
-  console.log('[TabyJourney] Command received:', command);
-
-  switch (command) {
-    case 'backward':
-    case 'backward-j':
-      executeBackward();
-      break;
-    case 'forward':
-    case 'forward-k':
-      executeForward();
-      break;
-    default:
-      console.warn('[TabyJourney] Unknown command:', command);
-  }
-}
-
-/**
  * メッセージハンドラー（Content Script や Popup からのメッセージ）
  */
 function handleMessage(
@@ -216,11 +196,29 @@ function handleMessage(
   return true; // 非同期レスポンスを許可
 }
 
-// イベントリスナーを登録
+// イベントリスナーを登録（トップレベルで直接登録が必須）
+console.log('[TabyJourney] Registering event listeners at top level...');
+
+// タブイベント
 chrome.tabs.onActivated.addListener(handleTabActivated);
 chrome.tabs.onRemoved.addListener(handleTabRemoved);
-chrome.commands.onCommand.addListener(handleCommand);
+
+// メッセージイベント
 chrome.runtime.onMessage.addListener(handleMessage);
+
+console.log('[TabyJourney] ✓ All listeners registered at top level');
+
+// 拡張機能インストール/アップデート時
+chrome.runtime.onInstalled.addListener((details) => {
+  console.log('[TabyJourney] onInstalled:', details.reason);
+  initialize();
+});
+
+// Chrome起動時
+chrome.runtime.onStartup.addListener(() => {
+  console.log('[TabyJourney] onStartup');
+  initialize();
+});
 
 // 初期化を実行
 initialize();

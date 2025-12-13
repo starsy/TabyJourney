@@ -3,7 +3,7 @@ import type { Settings } from '@/types/history';
 const SETTINGS_KEY = 'tabyjourney_settings';
 
 /**
- * デフォルト設定
+ * Default settings
  */
 const DEFAULT_SETTINGS: Settings = {
   maxHistorySize: 100,
@@ -11,10 +11,24 @@ const DEFAULT_SETTINGS: Settings = {
   separateByWindow: false,
   enableMouseGesture: true,
   showNotification: true,
+  backwardShortcut: {
+    key: 'BracketLeft', // [
+    alt: true,
+    ctrl: false,
+    shift: false,
+    meta: false,
+  },
+  forwardShortcut: {
+    key: 'BracketRight', // ]
+    alt: true,
+    ctrl: false,
+    shift: false,
+    meta: false,
+  },
 };
 
 /**
- * 設定を読み込む
+ * Load settings from storage
  */
 export async function loadSettings(): Promise<Settings> {
   return new Promise((resolve) => {
@@ -26,7 +40,7 @@ export async function loadSettings(): Promise<Settings> {
 }
 
 /**
- * 設定を保存する
+ * Save settings to storage
  */
 export async function saveSettings(settings: Settings): Promise<void> {
   return new Promise((resolve) => {
@@ -37,7 +51,7 @@ export async function saveSettings(settings: Settings): Promise<void> {
 }
 
 /**
- * デフォルト設定を取得
+ * Get default settings
  */
 export function getDefaultSettings(): Settings {
   return { ...DEFAULT_SETTINGS };

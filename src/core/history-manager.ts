@@ -3,7 +3,7 @@ import type { HistoryEntry, HistoryState } from '@/types/history';
 const DEFAULT_MAX_SIZE = 100;
 
 /**
- * タブ履歴を管理するマネージャー
+ * Manager for tab history
  */
 export class HistoryManager {
   private state: HistoryState;
@@ -17,32 +17,32 @@ export class HistoryManager {
   }
 
   /**
-   * 新しい履歴エントリを追加
+   * Add new history entry
    */
   addEntry(entry: HistoryEntry): void {
-    // 現在のエントリと同じタブIDの場合は追加しない
+    // Don't add if same tabId as current entry
     const currentEntry = this.state.entries[this.state.currentIndex];
     if (currentEntry && currentEntry.tabId === entry.tabId) {
       return;
     }
 
-    // currentIndexより前のForward履歴をクリア
+    // Clear forward history before currentIndex
     if (this.state.currentIndex > 0) {
       this.state.entries = this.state.entries.slice(this.state.currentIndex);
       this.state.currentIndex = 0;
     }
 
-    // 新しいエントリを先頭に追加
+    // Add new entry at the beginning
     this.state.entries.unshift(entry);
 
-    // 履歴上限を超えた場合、古いエントリを削除
+    // Remove old entries if exceeding max size
     if (this.state.entries.length > this.state.maxSize) {
       this.state.entries = this.state.entries.slice(0, this.state.maxSize);
     }
   }
 
   /**
-   * 現在の履歴状態を取得
+   * Get current history state
    */
   getState(): HistoryState {
     return {
@@ -52,7 +52,7 @@ export class HistoryManager {
   }
 
   /**
-   * 履歴状態を復元
+   * Restore history state
    */
   setState(state: HistoryState): void {
     this.state = {
@@ -62,7 +62,7 @@ export class HistoryManager {
   }
 
   /**
-   * 履歴から特定のタブIDを削除
+   * Remove specific tabId from history
    */
   removeTab(tabId: number): void {
     const removedIndex = this.state.entries.findIndex((entry) => entry.tabId === tabId);
@@ -73,17 +73,17 @@ export class HistoryManager {
 
     this.state.entries = this.state.entries.filter((entry) => entry.tabId !== tabId);
 
-    // 削除されたエントリがcurrentIndexより前にある場合、インデックスを調整
+    // Adjust index if removed entry is before currentIndex
     if (removedIndex < this.state.currentIndex) {
       this.state.currentIndex = Math.max(0, this.state.currentIndex - 1);
     } else if (removedIndex === this.state.currentIndex && this.state.entries.length > 0) {
-      // 現在位置のエントリが削除された場合、インデックスを維持（次のエントリが現在位置になる）
+      // If current position is removed, maintain index (next entry becomes current)
       this.state.currentIndex = Math.min(this.state.currentIndex, this.state.entries.length - 1);
     }
   }
 
   /**
-   * 履歴をクリア
+   * Clear all history
    */
   clear(): void {
     this.state.entries = [];

@@ -1,5 +1,5 @@
 /**
- * タブ履歴のエントリ
+ * Tab history entry
  */
 export interface HistoryEntry {
   tabId: number;
@@ -11,7 +11,7 @@ export interface HistoryEntry {
 }
 
 /**
- * 履歴の状態管理
+ * History state management
  */
 export interface HistoryState {
   entries: HistoryEntry[];
@@ -20,7 +20,18 @@ export interface HistoryState {
 }
 
 /**
- * 設定項目
+ * Keyboard shortcut configuration
+ */
+export interface KeyboardShortcut {
+  key: string; // KeyboardEvent.code (e.g., 'BracketLeft', 'KeyH')
+  alt: boolean;
+  ctrl: boolean;
+  shift: boolean;
+  meta: boolean;
+}
+
+/**
+ * User settings
  */
 export interface Settings {
   maxHistorySize: number;
@@ -28,15 +39,17 @@ export interface Settings {
   separateByWindow: boolean;
   enableMouseGesture: boolean;
   showNotification: boolean;
+  backwardShortcut: KeyboardShortcut;
+  forwardShortcut: KeyboardShortcut;
 }
 
 /**
- * ナビゲーションの方向
+ * Navigation direction
  */
 export type NavigationDirection = 'backward' | 'forward';
 
 /**
- * ナビゲーション結果
+ * Navigation result
  */
 export interface NavigationResult {
   success: boolean;

@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "TabyJourney TEST",
+  "version": "0.0.1",
+  "description": "Test keyboard shortcuts",
+  "permissions": ["tabs"],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "commands": {
+    "test-command": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+9",
+        "mac": "Command+Shift+9"
+      },
+      "description": "Test command"
+    }
+  }
+}

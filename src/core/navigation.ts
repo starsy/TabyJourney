@@ -2,18 +2,18 @@ import type { HistoryManager } from './history-manager';
 import type { NavigationResult } from '@/types/history';
 
 /**
- * タブ履歴のナビゲーションを制御
+ * Controller for tab history navigation
  */
 export class NavigationController {
   constructor(private historyManager: HistoryManager) {}
 
   /**
-   * Backward: 1つ前の履歴へ戻る
+   * Navigate backward to previous history entry
    */
   backward(): NavigationResult {
     const state = this.historyManager.getState();
 
-    // 履歴が空、または最後のエントリにいる場合は戻れない
+    // Cannot go back if history is empty or already at the oldest entry
     if (state.entries.length === 0) {
       return {
         success: false,
@@ -21,7 +21,7 @@ export class NavigationController {
       };
     }
 
-    // 次のインデックスを計算
+    // Calculate next index
     const nextIndex = state.currentIndex + 1;
 
     if (nextIndex >= state.entries.length) {
@@ -31,7 +31,7 @@ export class NavigationController {
       };
     }
 
-    // currentIndexを更新
+    // Update currentIndex
     const newState = {
       ...state,
       currentIndex: nextIndex,
@@ -45,12 +45,12 @@ export class NavigationController {
   }
 
   /**
-   * Forward: 1つ先の履歴へ進む
+   * Navigate forward to next history entry
    */
   forward(): NavigationResult {
     const state = this.historyManager.getState();
 
-    // currentIndexが0の場合は進めない
+    // Cannot go forward if currentIndex is 0
     if (state.currentIndex === 0) {
       return {
         success: false,
@@ -58,10 +58,10 @@ export class NavigationController {
       };
     }
 
-    // 前のインデックスを計算
+    // Calculate previous index
     const prevIndex = state.currentIndex - 1;
 
-    // currentIndexを更新
+    // Update currentIndex
     const newState = {
       ...state,
       currentIndex: prevIndex,
@@ -75,7 +75,7 @@ export class NavigationController {
   }
 
   /**
-   * Backwardできるかチェック
+   * Check if backward navigation is possible
    */
   canGoBackward(): boolean {
     const state = this.historyManager.getState();
@@ -83,7 +83,7 @@ export class NavigationController {
   }
 
   /**
-   * Forwardできるかチェック
+   * Check if forward navigation is possible
    */
   canGoForward(): boolean {
     const state = this.historyManager.getState();

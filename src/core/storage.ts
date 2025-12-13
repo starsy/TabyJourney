@@ -5,13 +5,13 @@ const STORAGE_KEY = 'tabyjourney_history_state';
 const DEFAULT_MAX_SIZE = 100;
 
 /**
- * 履歴状態をChrome Storageに永続化するマネージャー
+ * Manager for persisting history state to Chrome Storage
  */
 export class StorageManager {
   constructor(private storageAPI: StorageAPI) {}
 
   /**
-   * 履歴状態を読み込む
+   * Load history state from storage
    */
   async loadState(): Promise<HistoryState> {
     const result = await this.storageAPI.get(STORAGE_KEY);
@@ -28,7 +28,7 @@ export class StorageManager {
   }
 
   /**
-   * 履歴状態を保存する
+   * Save history state to storage
    */
   async saveState(state: HistoryState): Promise<void> {
     await this.storageAPI.set({
@@ -37,7 +37,7 @@ export class StorageManager {
   }
 
   /**
-   * 履歴状態をクリアする
+   * Clear history state from storage
    */
   async clearState(): Promise<void> {
     await this.storageAPI.remove(STORAGE_KEY);
