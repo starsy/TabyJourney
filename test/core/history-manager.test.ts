@@ -253,3 +253,39 @@ describe('HistoryManager', () => {
     });
   });
 });
+
+describe('HistoryManager removal position', () => {
+  it.each([
+    { ids: [1, 2, 1, 3, 4], currentIndex: 4, tabId: 1, expected: 2 },
+    { ids: [1, 2, 1, 3, 4], currentIndex: 2, tabId: 1, expected: 1 },
+    { ids: [1, 2, 1], currentIndex: 2, tabId: 1, expected: 0 },
+    { ids: [1], currentIndex: 0, tabId: 1, expected: 0 },
+  ])('keeps a valid position after removing $tabId from $ids', ({ ids, currentIndex, tabId, expected }) => {
+    const manager = new HistoryManager();
+    manager.setState({
+      entries: ids.map((id) => ({
+        tabId: id, windowId: 1, url: '', title: '', favicon: '', timestamp: 0,
+      })),
+      currentIndex,
+      maxSize: 100,
+    });
+
+    manager.removeTab(tabId);
+
+    expect(manager.getState().currentIndex).toBe(expected);
+    expect(manager.getState().entries.every((entry) => entry.tabId !== tabId)).toBe(true);
+  });
+});
+
+it('repairs an invalid saved position, including empty history', () => {
+  const manager = new HistoryManager();
+  const entry: HistoryEntry = {
+    tabId: 1, windowId: 1, url: '', title: '', favicon: '', timestamp: 0,
+  };
+
+  manager.setState({ entries: [entry], currentIndex: 5, maxSize: 100 });
+  expect(manager.getState().currentIndex).toBe(0);
+
+  manager.setState({ entries: [], currentIndex: 5, maxSize: 100 });
+  expect(manager.getState().currentIndex).toBe(0);
+});

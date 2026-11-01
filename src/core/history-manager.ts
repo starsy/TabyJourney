@@ -58,6 +58,8 @@ export class HistoryManager {
     this.state = {
       ...state,
       entries: [...state.entries],
+      // Older saved states can contain an index beyond the remaining entries.
+      currentIndex: Math.max(0, Math.min(state.currentIndex, state.entries.length - 1)),
     };
   }
 
@@ -65,21 +67,18 @@ export class HistoryManager {
    * Remove specific tabId from history
    */
   removeTab(tabId: number): void {
-    const removedIndex = this.state.entries.findIndex((entry) => entry.tabId === tabId);
+    const entries = this.state.entries;
+    const removedBeforeCurrent = entries
+      .slice(0, this.state.currentIndex)
+      .filter((entry) => entry.tabId === tabId).length;
 
-    if (removedIndex === -1) {
-      return;
-    }
+    this.state.entries = entries.filter((entry) => entry.tabId !== tabId);
 
-    this.state.entries = this.state.entries.filter((entry) => entry.tabId !== tabId);
-
-    // Adjust index if removed entry is before currentIndex
-    if (removedIndex < this.state.currentIndex) {
-      this.state.currentIndex = Math.max(0, this.state.currentIndex - 1);
-    } else if (removedIndex === this.state.currentIndex && this.state.entries.length > 0) {
-      // If current position is removed, maintain index (next entry becomes current)
-      this.state.currentIndex = Math.min(this.state.currentIndex, this.state.entries.length - 1);
-    }
+    // One tab can occur several times before the current position.
+    this.state.currentIndex = Math.max(0, Math.min(
+      this.state.currentIndex - removedBeforeCurrent,
+      this.state.entries.length - 1
+    ));
   }
 
   /**

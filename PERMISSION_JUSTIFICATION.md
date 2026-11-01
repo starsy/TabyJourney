@@ -32,7 +32,6 @@ Specifically, this permission is used to:
 
 2. **Save user settings**: Store customizable preferences including:
    - Maximum history size (default: 100 entries)
-   - Keyboard shortcut configurations (Alt+[ and Alt+])
    - Mouse gesture preferences
    - Auto-remove closed tabs setting
    - Notification preferences
@@ -43,29 +42,11 @@ All data is stored using Chrome's local storage API (chrome.storage.local and ch
 
 ## ホスト権限 が必要な理由
 
-TabyJourney requires host permissions ("<all_urls>") to enable keyboard shortcuts on all web pages.
+TabyJourney requires host permissions ("<all_urls>") for Shift + Mouse Back/Forward gestures on supported web pages.
 
-Specifically, this permission is used to:
+The content script listens for mouse events. It does not read or change page content, read form input, or send data to external servers.
 
-1. **Enable keyboard shortcuts globally**: The extension provides customizable keyboard shortcuts (default: Alt+[ for backward, Alt+] for forward) that must work on all websites. Chrome's Commands API does not support these specific key combinations, so we implement them using Content Scripts.
-
-2. **Capture keyboard events**: Listen for user-defined keyboard shortcuts on any web page to trigger tab history navigation
-
-3. **Support mouse gestures**: Detect Shift + Mouse Back/Forward button combinations on all pages for alternative navigation method
-
-**Important notes**:
-- The Content Script only listens for specific keyboard/mouse events and does NOT:
-  - Read or modify page content
-  - Inject any visual elements
-  - Access user input in forms
-  - Track user behavior
-  - Communicate with external servers
-
-- Users can customize or disable keyboard shortcuts in the extension's settings page
-
-- The extension works entirely offline and does not make any network requests
-
-The host permission is solely used to ensure keyboard shortcuts work consistently across all websites, providing a seamless tab navigation experience similar to browser's built-in back/forward functionality.
+Keyboard shortcuts use Chrome's Commands API and are configured at `chrome://extensions/shortcuts`. They do not require host permissions or a page keyboard listener.
 
 ---
 

@@ -7,7 +7,7 @@ Navigate your browser tab history like browser history with Backward/Forward but
 ## Features
 
 - 🔙 **Backward/Forward Navigation**: Navigate through your tab history just like browser history
-- ⌨️ **Customizable Keyboard Shortcuts**: Default Alt+[ and Alt+] (fully customizable)
+- ⌨️ **Customizable Keyboard Shortcuts**: Assign navigation keys in Chrome shortcut settings
 - 🖱️ **Mouse Gesture Support**: Shift + Mouse Back/Forward buttons
 - 📜 **History Popup**: Visual tab history with current position indicator
 - ⚙️ **Settings Page**: Customize behavior, shortcuts, and preferences
@@ -47,30 +47,17 @@ Coming soon...
 
 ### Keyboard Shortcuts
 
-TabyJourney provides two types of keyboard shortcuts:
+Configure all shortcuts at `chrome://extensions/shortcuts`:
 
-#### Navigation Shortcuts (Customizable in Settings)
+1. Find TabyJourney.
+2. Assign keys to **Navigate backward in tab history** and **Navigate forward in tab history**. Both start unassigned.
+3. Use **Activate the extension** to change the popup shortcut. Its default is **Alt + L** (⌥L).
 
-Default shortcuts for navigating tab history:
+The extension Options page has an **Open Chrome shortcut settings** button for direct access. Saving or resetting extension options does not change Chrome shortcut assignments.
 
-- **Alt + [** (⌥[): Navigate backward in tab history
-- **Alt + ]** (⌥]): Navigate forward in tab history
+Navigation shortcuts run through the background worker. They do not need a page refresh or a content script on the active page. Use keys supported by Chrome, such as letters or arrows. Bracket keys [ ] are not supported. Chrome or operating system shortcuts can take priority.
 
-**How to customize:**
-1. Right-click the extension icon → Select "Options"
-2. Go to "Keyboard Shortcuts" section
-3. Click the input field and press your desired key combination
-
-**Note:** These shortcuts work on all web pages but are **not visible** in `chrome://extensions/shortcuts` due to Chrome API limitations.
-
-#### Popup Shortcut (Chrome Extensions Page)
-
-- **Alt + L** (⌥L): Show tab history popup
-
-**How to customize:**
-1. Go to `chrome://extensions/shortcuts`
-2. Find "TabyJourney - Activate the extension"
-3. Click the pencil icon and set your preferred shortcut
+The old page shortcuts from extension options are no longer used. Assign replacement shortcuts in Chrome.
 
 ### Mouse Gestures
 
@@ -89,7 +76,7 @@ Click the TabyJourney icon in your toolbar to:
 Right-click the extension icon and select "Options" to customize:
 
 - **History size**: Maximum number of tabs to remember (default: 100)
-- **Keyboard shortcuts**: Customize your navigation keys (Alt+[ / Alt+])
+- **Keyboard shortcuts**: Open Chrome shortcut settings to assign navigation keys
 - **Mouse gestures**: Enable/disable mouse button navigation
 - **Notifications**: Show alerts when reaching history limits
 - **Auto-remove closed tabs**: Remove tabs from history when closed
@@ -152,7 +139,7 @@ TabyJourney/
 │   │   └── storage.ts
 │   ├── background/        # Service Worker
 │   ├── popup/             # Popup UI
-│   ├── content/           # Content Script (keyboard/mouse)
+│   ├── content/           # Content Script (mouse gestures)
 │   ├── options/           # Settings page
 │   ├── types/             # TypeScript definitions
 │   └── utils/             # Utilities

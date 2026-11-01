@@ -1,226 +1,148 @@
 import { StorageManager } from '@core/storage';
 import { HistoryManager } from '@core/history-manager';
-import { NavigationController } from '@core/navigation';
-import type { HistoryEntry } from '@/types/history';
-import { ChromeStorageAdapter, getTabInfo, activateTab, tabExists } from './chrome-adapter';
+import type { HistoryState, NavigationDirection, NavigationResult } from '@/types/history';
+import { loadSettings } from '@utils/settings';
+import { ChromeStorageAdapter, getTabInfo, activateTab } from './chrome-adapter';
 
-// グローバルインスタンス
-const storageAdapter = new ChromeStorageAdapter();
-const storageManager = new StorageManager(storageAdapter);
+const storageManager = new StorageManager(new ChromeStorageAdapter());
 const historyManager = new HistoryManager();
-const navigationController = new NavigationController(historyManager);
 
-// ナビゲーション中フラグ（履歴追加を防ぐ）
-let isNavigating = false;
+// Match activation events to their target. A general flag can hide a user action.
+const expectedActivations = new Set<number>();
+let initialized = false;
+let operationQueue: Promise<unknown> = Promise.resolve();
 
-/**
- * 初期化: ストレージから履歴を読み込む
- */
-async function initialize(): Promise<void> {
-  try {
-    const state = await storageManager.loadState();
-    historyManager.setState(state);
-    console.log('[TabyJourney] Initialized with', state.entries.length, 'entries');
-  } catch (error) {
-    console.error('[TabyJourney] Failed to initialize:', error);
-  }
+function enqueue<T>(operation: () => Promise<T>): Promise<T> {
+  const result = operationQueue.then(async () => {
+    // Retry a failed read on the next event. Never save an empty fallback state.
+    if (!initialized) {
+      historyManager.setState(await storageManager.loadState());
+      initialized = true;
+    }
+
+    return operation();
+  });
+
+  // One failed operation must not block later events.
+  operationQueue = result.catch(() => undefined);
+  return result;
 }
 
-/**
- * 履歴を保存
- */
 async function saveHistory(): Promise<void> {
-  try {
-    const state = historyManager.getState();
-    await storageManager.saveState(state);
-  } catch (error) {
-    console.error('[TabyJourney] Failed to save history:', error);
-  }
+  await storageManager.saveState(historyManager.getState());
 }
 
-/**
- * タブアクティブ化イベントハンドラー
- */
-async function handleTabActivated(activeInfo: chrome.tabs.TabActiveInfo): Promise<void> {
-  // ナビゲーション中は履歴に追加しない
-  if (isNavigating) {
-    isNavigating = false;
+function reportError(error: unknown): void {
+  console.error('[TabyJourney] Operation failed:', error);
+}
+
+async function recordActivation(activeInfo: chrome.tabs.TabActiveInfo): Promise<void> {
+  const tab = await getTabInfo(activeInfo.tabId);
+  if (tab.url?.startsWith('chrome://') || tab.url?.startsWith('edge://')) {
     return;
   }
 
-  try {
-    const tab = await getTabInfo(activeInfo.tabId);
-
-    // chrome:// や edge:// などの内部URLは無視
-    if (tab.url?.startsWith('chrome://') || tab.url?.startsWith('edge://')) {
-      return;
-    }
-
-    const entry: HistoryEntry = {
-      tabId: tab.id!,
-      windowId: activeInfo.windowId,
-      url: tab.url || '',
-      title: tab.title || '',
-      favicon: tab.favIconUrl || '',
-      timestamp: Date.now(),
-    };
-
-    historyManager.addEntry(entry);
-    await saveHistory();
-
-    console.log('[TabyJourney] Added entry:', entry.title);
-  } catch (error) {
-    console.error('[TabyJourney] Failed to handle tab activation:', error);
-  }
+  historyManager.addEntry({
+    tabId: activeInfo.tabId,
+    windowId: activeInfo.windowId,
+    url: tab.url || '',
+    title: tab.title || '',
+    favicon: tab.favIconUrl || '',
+    timestamp: Date.now(),
+  });
+  await saveHistory();
 }
 
-/**
- * タブ削除イベントハンドラー
- */
-async function handleTabRemoved(tabId: number): Promise<void> {
-  try {
-    historyManager.removeTab(tabId);
-    await saveHistory();
+async function navigate(direction: NavigationDirection): Promise<NavigationResult> {
+  const state = historyManager.getState();
+  const step = direction === 'backward' ? 1 : -1;
+  const currentTabId = state.entries[state.currentIndex]?.tabId;
 
-    console.log('[TabyJourney] Removed tab from history:', tabId);
-  } catch (error) {
-    console.error('[TabyJourney] Failed to handle tab removal:', error);
+  for (let index = state.currentIndex + step; index >= 0 && index < state.entries.length; index += step) {
+    const entry = state.entries[index];
+    if (entry.tabId === currentTabId) {
+      continue;
+    }
+
+    let tab: chrome.tabs.Tab;
+    try {
+      tab = await getTabInfo(entry.tabId);
+    } catch {
+      // Skip unavailable tabs without deleting the saved history.
+      continue;
+    }
+
+    if (!tab.active) {
+      expectedActivations.add(entry.tabId);
+    }
+
+    try {
+      await activateTab(entry.tabId);
+    } catch (error) {
+      expectedActivations.delete(entry.tabId);
+      throw error;
+    }
+
+    // Commit the position only after Chrome accepts the activation.
+    historyManager.setState({ ...state, currentIndex: index });
+    await saveHistory();
+    return { success: true, targetTabId: entry.tabId };
   }
+
+  return { success: false, error: `No available tab ${direction}` };
 }
 
-/**
- * Backwardコマンドの実行
- */
-async function executeBackward(): Promise<void> {
-  try {
-    const result = navigationController.backward();
-
-    if (!result.success) {
-      console.log('[TabyJourney] Cannot go backward:', result.error);
-      // TODO: 通知を表示
-      return;
-    }
-
-    // タブが存在するか確認
-    const exists = await tabExists(result.targetTabId!);
-    if (!exists) {
-      console.log('[TabyJourney] Target tab does not exist, removing from history');
-      historyManager.removeTab(result.targetTabId!);
-      await saveHistory();
-      // リトライ
-      await executeBackward();
-      return;
-    }
-
-    // ナビゲーションフラグをON
-    isNavigating = true;
-
-    // タブをアクティブ化
-    await activateTab(result.targetTabId!);
-    await saveHistory();
-
-    console.log('[TabyJourney] Navigated backward to tab:', result.targetTabId);
-  } catch (error) {
-    console.error('[TabyJourney] Failed to execute backward:', error);
-    isNavigating = false;
-  }
-}
-
-/**
- * Forwardコマンドの実行
- */
-async function executeForward(): Promise<void> {
-  try {
-    const result = navigationController.forward();
-
-    if (!result.success) {
-      console.log('[TabyJourney] Cannot go forward:', result.error);
-      // TODO: 通知を表示
-      return;
-    }
-
-    // タブが存在するか確認
-    const exists = await tabExists(result.targetTabId!);
-    if (!exists) {
-      console.log('[TabyJourney] Target tab does not exist, removing from history');
-      historyManager.removeTab(result.targetTabId!);
-      await saveHistory();
-      // リトライ
-      await executeForward();
-      return;
-    }
-
-    // ナビゲーションフラグをON
-    isNavigating = true;
-
-    // タブをアクティブ化
-    await activateTab(result.targetTabId!);
-    await saveHistory();
-
-    console.log('[TabyJourney] Navigated forward to tab:', result.targetTabId);
-  } catch (error) {
-    console.error('[TabyJourney] Failed to execute forward:', error);
-    isNavigating = false;
-  }
-}
-
-/**
- * メッセージハンドラー（Content Script や Popup からのメッセージ）
- */
-function handleMessage(
-  message: { type: string; payload?: unknown },
-  _sender: chrome.runtime.MessageSender,
-  sendResponse: (response: unknown) => void
-): boolean {
-  console.log('[TabyJourney] Message received:', message.type);
-
+async function processMessage(message: { type: string }): Promise<NavigationResult | { state: HistoryState }> {
   switch (message.type) {
     case 'backward':
     case 'mouseBackward':
-      executeBackward();
-      sendResponse({ success: true });
-      break;
+      return navigate('backward');
     case 'forward':
     case 'mouseForward':
-      executeForward();
-      sendResponse({ success: true });
-      break;
+      return navigate('forward');
     case 'getHistory':
-      sendResponse({ state: historyManager.getState() });
-      break;
+      return { state: historyManager.getState() };
     default:
-      console.warn('[TabyJourney] Unknown message type:', message.type);
-      sendResponse({ success: false, error: 'Unknown message type' });
+      return { success: false, error: 'Unknown message type' };
   }
-
-  return true; // 非同期レスポンスを許可
 }
 
-// イベントリスナーを登録（トップレベルで直接登録が必須）
-console.log('[TabyJourney] Registering event listeners at top level...');
+// Register listeners synchronously so Chrome can deliver the event that wakes us.
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  // Consume this event before entering the queue. Navigation can still be running.
+  if (expectedActivations.delete(activeInfo.tabId)) {
+    return;
+  }
 
-// タブイベント
-chrome.tabs.onActivated.addListener(handleTabActivated);
-chrome.tabs.onRemoved.addListener(handleTabRemoved);
-
-// メッセージイベント
-chrome.runtime.onMessage.addListener(handleMessage);
-
-console.log('[TabyJourney] ✓ All listeners registered at top level');
-
-// 拡張機能インストール/アップデート時
-chrome.runtime.onInstalled.addListener((details) => {
-  console.log('[TabyJourney] onInstalled:', details.reason);
-  initialize();
+  void enqueue(() => recordActivation(activeInfo)).catch(reportError);
 });
 
-// Chrome起動時
-chrome.runtime.onStartup.addListener(() => {
-  console.log('[TabyJourney] onStartup');
-  initialize();
+chrome.tabs.onRemoved.addListener((tabId) => {
+  expectedActivations.delete(tabId);
+  void enqueue(async () => {
+    const settings = await loadSettings();
+    if (settings.removeClosedTabs) {
+      historyManager.removeTab(tabId);
+      await saveHistory();
+    }
+  }).catch(reportError);
 });
 
-// 初期化を実行
-initialize();
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  void enqueue(() => processMessage(message)).then(sendResponse, (error: unknown) => {
+    reportError(error);
+    sendResponse({ success: false, error: 'Cannot read or update tab history' });
+  });
 
-console.log('[TabyJourney] Service worker loaded');
+  return true;
+});
+
+// Chrome commands work without a content script on the active page.
+// Use the same queue as popup buttons to keep navigation in order.
+chrome.commands.onCommand.addListener((command) => {
+  if (command === 'navigate-backward') {
+    void enqueue(() => navigate('backward')).catch(reportError);
+  } else if (command === 'navigate-forward') {
+    void enqueue(() => navigate('forward')).catch(reportError);
+  }
+});

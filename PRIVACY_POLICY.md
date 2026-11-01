@@ -1,6 +1,6 @@
 # Privacy Policy for TabyJourney
 
-**Last Updated: December 13, 2024**
+**Last Updated: November 1, 2026**
 
 ## Overview
 
@@ -20,7 +20,6 @@ TabyJourney collects and stores the following information **locally on your devi
 
 2. **User Settings**:
    - Maximum history size preference
-   - Keyboard shortcut configurations
    - Mouse gesture preferences
    - Notification preferences
    - Window separation settings
@@ -52,7 +51,9 @@ TabyJourney requires the following permissions:
 
 - **`tabs`**: To access tab information (title, URL, ID) for navigation functionality
 - **`storage`**: To save your tab history and user preferences locally
-- **`<all_urls>`**: To enable keyboard shortcuts and mouse gestures on all websites
+- **`<all_urls>`**: To enable mouse gestures on supported web pages
+
+Keyboard shortcut assignments are managed by Chrome. TabyJourney no longer reads or uses the old shortcut values saved in extension options.
 
 ## Third-Party Services
 

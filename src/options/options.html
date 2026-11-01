@@ -41,22 +41,13 @@
 
       <div class="section">
         <h2 class="section-title">Keyboard Shortcuts</h2>
-
+        <p class="label-description">Set navigation and popup shortcuts in Chrome.</p>
+        <p class="label-description">Find TabyJourney, then assign keys to “Navigate backward in tab history” and “Navigate forward in tab history”. Both start unassigned.</p>
         <div class="setting-item">
-          <label for="backwardShortcut" class="label">
-            <span class="label-text">Backward Shortcut (Go Back)</span>
-            <span class="label-description">Press a key to set (e.g., Alt+[)</span>
-          </label>
-          <input type="text" id="backwardShortcut" class="input-shortcut" readonly placeholder="Click and press a key">
+          <button id="shortcutSettingsBtn" type="button" class="btn btn-primary">Open Chrome shortcut settings</button>
         </div>
-
-        <div class="setting-item">
-          <label for="forwardShortcut" class="label">
-            <span class="label-text">Forward Shortcut (Go Forward)</span>
-            <span class="label-description">Press a key to set (e.g., Alt+])</span>
-          </label>
-          <input type="text" id="forwardShortcut" class="input-shortcut" readonly placeholder="Click and press a key">
-        </div>
+        <p class="help-text">Use keys supported by Chrome, such as letters or arrows. Bracket keys [ ] are not supported.</p>
+        <p id="shortcutStatus" class="help-text" role="status"></p>
       </div>
 
       <div class="section">
@@ -105,14 +96,9 @@
     </main>
 
     <footer class="footer">
-      <p><strong>Keyboard Shortcuts:</strong></p>
-      <p class="help-text">• <strong>Alt+[ / Alt+]</strong> (⌥[ / ⌥]) - Navigate backward/forward (customizable above)</p>
-      <p class="help-text">• <strong>Alt+L</strong> (⌥L) - Show history popup</p>
-      <p class="help-text">• Click extension icon - Show history popup</p>
-      <br>
-      <p class="help-text"><strong>Note:</strong> Alt+L can also be customized at <code>chrome://extensions/shortcuts</code></p>
-      <p class="help-text">Alt+[ / Alt+] work on all web pages but are not shown in Chrome's shortcuts page due to API limitations.</p>
-      <p class="version">TabyJourney v0.1.0</p>
+      <p class="help-text">Click the extension icon to open tab history. The default popup shortcut is Alt+L (⌥L).</p>
+      <p class="help-text">Use Chrome shortcut settings to change shortcut assignments. Save and Reset to Default apply only to the other settings on this page.</p>
+      <p class="version">TabyJourney v0.1.1</p>
     </footer>
   </div>
   <script type="module" src="options.ts"></script>

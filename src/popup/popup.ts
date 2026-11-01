@@ -4,8 +4,13 @@ import type { HistoryState, HistoryEntry } from '@/types/history';
  * Get history from Service Worker
  */
 async function getHistory(): Promise<HistoryState> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage({ type: 'getHistory' }, (response) => {
+      if (chrome.runtime.lastError || !response?.state) {
+        reject(new Error(chrome.runtime.lastError?.message || response?.error || 'Cannot read tab history'));
+        return;
+      }
+
       resolve(response.state);
     });
   });
@@ -22,7 +27,7 @@ async function activateTab(tabId: number): Promise<void> {
  * Execute backward command
  */
 async function executeBackward(): Promise<void> {
-  chrome.runtime.sendMessage({ type: 'backward' });
+  await chrome.runtime.sendMessage({ type: 'backward' });
   // Don't close popup, refresh history to update display
   await refreshHistory();
 }
@@ -31,7 +36,7 @@ async function executeBackward(): Promise<void> {
  * Execute forward command
  */
 async function executeForward(): Promise<void> {
-  chrome.runtime.sendMessage({ type: 'forward' });
+  await chrome.runtime.sendMessage({ type: 'forward' });
   // Don't close popup, refresh history to update display
   await refreshHistory();
 }
@@ -40,9 +45,6 @@ async function executeForward(): Promise<void> {
  * Refresh history and update display
  */
 async function refreshHistory(): Promise<void> {
-  // Wait a bit for Service Worker processing to complete
-  await new Promise((resolve) => setTimeout(resolve, 100));
-
   const state = await getHistory();
   updateHeader(state);
   renderHistoryList(state);
@@ -175,4 +177,12 @@ async function initialize(): Promise<void> {
 }
 
 // Initialize after DOM loaded
-document.addEventListener('DOMContentLoaded', initialize);
+document.addEventListener('DOMContentLoaded', () => {
+  void initialize().catch((error: unknown) => {
+    console.error('[TabyJourney] Failed to load history:', error);
+    const list = document.getElementById('history-list');
+    if (list) {
+      list.textContent = 'Cannot load history. Close this popup and try again.';
+    }
+  });
+});

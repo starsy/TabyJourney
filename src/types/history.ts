@@ -20,17 +20,6 @@ export interface HistoryState {
 }
 
 /**
- * Keyboard shortcut configuration
- */
-export interface KeyboardShortcut {
-  key: string; // KeyboardEvent.code (e.g., 'BracketLeft', 'KeyH')
-  alt: boolean;
-  ctrl: boolean;
-  shift: boolean;
-  meta: boolean;
-}
-
-/**
  * User settings
  */
 export interface Settings {
@@ -39,8 +28,6 @@ export interface Settings {
   separateByWindow: boolean;
   enableMouseGesture: boolean;
   showNotification: boolean;
-  backwardShortcut: KeyboardShortcut;
-  forwardShortcut: KeyboardShortcut;
 }
 
 /**

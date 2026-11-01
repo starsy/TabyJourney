@@ -23,7 +23,7 @@ TabyJourneyをChrome Web Storeに公開するための最終チェックリス�
 
 - [ ] `author` フィールドを実際の名前に更新
 - [ ] `homepage_url` を実際のGitHub URLに更新
-- [ ] バージョン番号が正しい (現在: 0.1.0)
+- [ ] バージョン番号が正しい (現在: 0.1.1)
 - [ ] すべての`permissions`が必要最小限
 - [ ] アイコンパスが正しい
 
@@ -178,7 +178,7 @@ just package
 
 - [ ] 公開を確認: `https://chrome.google.com/webstore/detail/[extension-id]`
 - [ ] README.mdのインストールリンクを更新
-- [ ] GitHubリポジトリにリリースタグを作成 (`v0.1.0`)
+- [ ] GitHubリポジトリにリリースタグを作成 (`v0.1.1`)
 - [ ] SNSやブログで告知（オプション）
 
 ### 13. アップデート管理

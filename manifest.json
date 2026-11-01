@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TabyJourney",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Navigate tab history like browser history with Backward/Forward buttons",
   "author": "Your Name",
   "homepage_url": "https://github.com/yourusername/TabyJourney",
@@ -44,6 +44,12 @@
         "mac": "Alt+L"
       },
       "description": "Show tab history popup"
+    },
+    "navigate-backward": {
+      "description": "Navigate backward in tab history"
+    },
+    "navigate-forward": {
+      "description": "Navigate forward in tab history"
     }
   }
 }
